@@ -687,12 +687,16 @@
     <div id="detail-modal" role="dialog" aria-modal="true" aria-label="Détail du véhicule" class="fixed inset-0 z-50 hidden overflow-y-auto bg-racing-espressoDark/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-racing-creamLight rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border-2 border-racing-espresso">
             <div class="relative">
-                <img id="modal-img" src="" alt="Détail véhicule" decoding="async" class="w-full h-64 sm:h-80 object-cover bg-racing-espresso">
+                <div id="modal-stage" class="relative w-full h-[46vh] min-h-[16rem] sm:h-[28rem] bg-racing-espressoDark overflow-hidden cursor-zoom-in" onclick="openLightbox()">
+                    <img id="modal-bg" src="" alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-50">
+                    <img id="modal-img" src="" alt="Détail véhicule" decoding="async" class="relative w-full h-full object-contain select-none">
+                    <span class="absolute bottom-4 right-4 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-racing-espresso/85 text-racing-cream"><i class="fa-solid fa-magnifying-glass-plus mr-1.5"></i><span id="modal-count">1/1</span></span>
+                </div>
                 <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-racing-espresso hover:bg-racing-orange text-racing-cream border-2 border-racing-cream flex items-center justify-center transition-colors cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
-                <button id="modal-prev" type="button" onclick="setModalImg(modalIdx-1)" aria-label="Photo précédente" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-racing-espresso/80 text-racing-cream cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="modal-next" type="button" onclick="setModalImg(modalIdx+1)" aria-label="Photo suivante" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-racing-espresso/80 text-racing-cream cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="modal-prev" type="button" onclick="event.stopPropagation();setModalImg(modalIdx-1)" aria-label="Photo précédente" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-racing-espresso/80 text-racing-cream cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="modal-next" type="button" onclick="event.stopPropagation();setModalImg(modalIdx+1)" aria-label="Photo suivante" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-racing-espresso/80 text-racing-cream cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
                 <span id="modal-badge" class="absolute bottom-4 left-4 px-3.5 py-1.5 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-racing-espresso text-racing-cream border border-racing-cream/30">
                     Catégorie
                 </span>
@@ -735,6 +739,23 @@
                 </form>
             </div>
         </div>
+    </div>
+
+
+    <!-- PHOTO EN GRAND -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo en grand" class="hidden fixed inset-0 z-[70] bg-black/95 flex flex-col">
+        <div class="flex items-center justify-between p-3 text-racing-cream">
+            <span id="lb-count" class="text-sm font-bold px-2"></span>
+            <div class="flex gap-2">
+                <button type="button" onclick="lbToggleZoom()" aria-label="Zoom" class="h-10 px-4 rounded-xl border border-racing-cream/40 text-xs font-extrabold uppercase cursor-pointer"><i class="fa-solid fa-magnifying-glass-plus mr-1.5"></i><span id="lb-zoom-label">Zoom</span></button>
+                <button type="button" onclick="closeLightbox()" aria-label="Fermer" class="w-10 h-10 rounded-xl border border-racing-cream/40 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+        <div id="lb-stage" class="flex-1 overflow-auto flex relative">
+            <img id="lb-img" src="" alt="" class="m-auto max-w-full max-h-full object-contain select-none cursor-zoom-in">
+        </div>
+        <button id="lb-prev" type="button" onclick="lbNav(-1)" aria-label="Photo précédente" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-racing-espresso/85 text-racing-cream border border-racing-cream/40 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
+        <button id="lb-next" type="button" onclick="lbNav(1)" aria-label="Photo suivante" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-racing-espresso/85 text-racing-cream border border-racing-cream/40 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 
     <!-- BOUTONS FLOTTANTS -->
@@ -1227,10 +1248,11 @@
             grid.innerHTML = filtered.map(v => `
                 <article class="${v.sold ? 'opacity-70' : ''} group bg-racing-cream rounded-2xl border-2 border-racing-espresso overflow-hidden shadow-retro hover:-translate-y-1 transition-all duration-300 flex flex-col">
                     <!-- Photo & Badges -->
-                    <div class="relative h-56 overflow-hidden bg-racing-espresso border-b-2 border-racing-espresso">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-racing-espressoDark border-b-2 border-racing-espresso">
+                        <img src="${esc(cover(v))}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-60">
                         <img src="${esc(cover(v))}" alt="${esc(v.title)}" loading="lazy" decoding="async"
                              onerror="this.onerror=null;this.src=placeholder('${esc(v.category)}')"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                             class="relative w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-500">
                         <button type="button" onclick="toggleFav(event, ${Number(v.id)})" aria-label="Favori" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-racing-espresso/80 text-racing-cream flex items-center justify-center hover:bg-racing-orange transition-colors cursor-pointer"><i class="${favs().includes(v.id) ? 'fa-solid text-racing-orange' : 'fa-regular'} fa-heart"></i></button>
                         ${v.sold ? '<span class="absolute inset-0 flex items-center justify-center bg-racing-espressoDark/60 text-racing-cream font-display text-4xl font-bold uppercase tracking-widest -rotate-6">Vendu</span>' : ''}
                         <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-md ${getCategoryBadgeStyle(v.category)}">
@@ -1314,10 +1336,72 @@
         }
 
                 // ===== 5. FICHE VÉHICULE (galerie) =====
+
+        // ===== PHOTO EN GRAND (zoom, glisser) =====
+        let lbOpen = false, lbZoomed = false, lbSwiped = false;
+        function renderLightbox() {
+            const img = document.getElementById('lb-img');
+            img.src = modalImages[modalIdx];
+            img.alt = selectedVehicleForDetail ? selectedVehicleForDetail.title : '';
+            document.getElementById('lb-count').textContent = `${modalIdx + 1} / ${modalImages.length}`;
+            const multi = modalImages.length > 1;
+            document.getElementById('lb-prev').classList.toggle('hidden', !multi);
+            document.getElementById('lb-next').classList.toggle('hidden', !multi);
+            lbSetZoom(false);
+        }
+        function openLightbox() {
+            if (!modalImages.length) return;
+            lbOpen = true;
+            document.getElementById('lightbox').classList.remove('hidden');
+            renderLightbox();
+        }
+        function closeLightbox() { lbOpen = false; document.getElementById('lightbox').classList.add('hidden'); }
+        function lbNav(d) { setModalImg(modalIdx + d); }
+        function lbSetZoom(on) {
+            lbZoomed = on;
+            const img = document.getElementById('lb-img');
+            if (on) { img.style.maxWidth = 'none'; img.style.maxHeight = 'none'; img.style.width = '260%'; img.style.cursor = 'zoom-out'; }
+            else { img.style.maxWidth = ''; img.style.maxHeight = ''; img.style.width = ''; img.style.cursor = ''; document.getElementById('lb-stage').scrollTo(0, 0); }
+            document.getElementById('lb-zoom-label').textContent = on ? 'Réduire' : 'Zoom';
+        }
+        function lbToggleZoom() { lbSetZoom(!lbZoomed); }
+        // clic sur la photo : zoom / dézoom, centré sur le point touché
+        document.addEventListener('click', (e) => {
+            if (e.target.id !== 'lb-img' || lbSwiped) return;
+            const img = e.target, r = img.getBoundingClientRect();
+            const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+            lbSetZoom(!lbZoomed);
+            if (lbZoomed) {
+                const st = document.getElementById('lb-stage'), r2 = img.getBoundingClientRect();
+                st.scrollLeft = fx * r2.width - st.clientWidth / 2;
+                st.scrollTop = fy * r2.height - st.clientHeight / 2;
+            }
+        });
+        // glisser du doigt pour changer de photo
+        (function () {
+            let sx = 0, sy = 0;
+            const bind = (id, cond) => {
+                const el = document.getElementById(id); if (!el) return;
+                el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+                el.addEventListener('touchend', e => {
+                    if (!cond() || modalImages.length < 2) return;
+                    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+                    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                        lbSwiped = true; setTimeout(() => lbSwiped = false, 350);
+                        setModalImg(modalIdx + (dx < 0 ? 1 : -1));
+                    }
+                }, { passive: true });
+            };
+            window.addEventListener('DOMContentLoaded', () => { bind('modal-stage', () => !lbOpen); bind('lb-stage', () => !lbZoomed); });
+        })();
+
         let modalImages = [], modalIdx = 0;
         function setModalImg(i) {
             modalIdx = (i + modalImages.length) % modalImages.length;
             document.getElementById('modal-img').src = modalImages[modalIdx];
+            document.getElementById('modal-bg').src = modalImages[modalIdx];
+            document.getElementById('modal-count').textContent = `${modalIdx + 1}/${modalImages.length}`;
+            if (lbOpen) renderLightbox();
             document.querySelectorAll('#modal-thumbs button').forEach((b, n) => b.classList.toggle('ring-2', n === modalIdx));
             document.querySelectorAll('#modal-thumbs button').forEach((b, n) => b.classList.toggle('ring-racing-orange', n === modalIdx));
         }
@@ -1328,7 +1412,7 @@
             modalImages = (vehicle.images && vehicle.images.length) ? vehicle.images : [cover(vehicle)];
             document.getElementById('modal-img').alt = vehicle.title;
             document.getElementById('modal-thumbs').innerHTML = modalImages.length > 1 ? modalImages.map((src, i) =>
-                `<button type="button" onclick="setModalImg(${i})" class="flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 border-racing-espresso cursor-pointer"><img src="${esc(src)}" alt="" class="w-full h-full object-cover"></button>`).join('') : '';
+                `<button type="button" onclick="setModalImg(${i})" class="flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 border-racing-espresso cursor-pointer"><img src="${esc(src)}" alt="" class="w-full h-full object-cover"></button>`).join('') : '';
             document.getElementById('modal-thumbs').classList.toggle('hidden', modalImages.length < 2);
             document.getElementById('modal-prev').classList.toggle('hidden', modalImages.length < 2);
             document.getElementById('modal-next').classList.toggle('hidden', modalImages.length < 2);
@@ -1346,6 +1430,7 @@
             if (currentView === 'public') history.replaceState(null, '', '#v-' + vehicle.id);
         }
         function closeDetailModal() {
+            closeLightbox();
             document.getElementById('detail-modal').classList.add('hidden');
             document.body.style.overflow = '';
             if (location.hash.startsWith('#v-')) history.replaceState(null, '', location.pathname + location.search);
@@ -1701,6 +1786,14 @@ async function handleInquirySubmit(e) {
             if (!e.target.closest('#account-btn') && !e.target.closest('#account-menu')) document.getElementById('account-menu').classList.add('hidden');
         });
         window.addEventListener('keydown', (e) => {
+            if (lbOpen) {
+                if (e.key === 'Escape') closeLightbox();
+                else if (e.key === 'ArrowLeft') lbNav(-1);
+                else if (e.key === 'ArrowRight') lbNav(1);
+                return;
+            }
+            if (e.key === 'ArrowLeft' && !document.getElementById('detail-modal').classList.contains('hidden')) { setModalImg(modalIdx - 1); return; }
+            if (e.key === 'ArrowRight' && !document.getElementById('detail-modal').classList.contains('hidden')) { setModalImg(modalIdx + 1); return; }
             if (e.key !== 'Escape') return;
             closeDetailModal(); closeLegal();
         });
