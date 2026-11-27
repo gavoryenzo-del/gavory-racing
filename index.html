@@ -69,6 +69,8 @@
             background-position: 0 0, 16px 16px;
         }
         .hero-title { line-height: 1.3 !important; }
+        #detail-modal > div { overflow: clip; }
+        @media (max-width: 639px) { .modal-media { position: sticky; top: 0; z-index: 20; box-shadow: 0 6px 14px rgba(0,0,0,.25); } #modal-thumbs { padding: .4rem .6rem; } #modal-thumbs button { width: 4rem !important; height: 2.8rem !important; } }
     </style>
 </head>
 <body class="bg-racing-creamLight text-racing-espresso font-sans antialiased selection:bg-racing-orange selection:text-racing-cream">
@@ -686,8 +688,9 @@
     <!-- MODALE 1 : DÉTAILS D'UN VÉHICULE & CONTACT VENDEUR -->
     <div id="detail-modal" role="dialog" aria-modal="true" aria-label="Détail du véhicule" class="fixed inset-0 z-50 hidden overflow-y-auto bg-racing-espressoDark/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-racing-creamLight rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border-2 border-racing-espresso">
+            <div class="modal-media">
             <div class="relative">
-                <div id="modal-stage" class="relative w-full h-[46vh] min-h-[16rem] sm:h-[28rem] bg-racing-espressoDark overflow-hidden cursor-zoom-in" onclick="openLightbox()">
+                <div id="modal-stage" class="relative w-full h-[34vh] min-h-[12rem] sm:h-[28rem] bg-racing-espressoDark overflow-hidden cursor-zoom-in" onclick="openLightbox()">
                     <img id="modal-bg" src="" alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-50">
                     <img id="modal-img" src="" alt="Détail véhicule" decoding="async" class="relative w-full h-full object-contain select-none">
                     <span class="absolute bottom-4 right-4 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-racing-espresso/85 text-racing-cream"><i class="fa-solid fa-magnifying-glass-plus mr-1.5"></i><span id="modal-count">1/1</span></span>
@@ -703,6 +706,7 @@
             </div>
 
             <div id="modal-thumbs" class="hidden flex gap-2 p-3 overflow-x-auto bg-racing-cream border-b-2 border-racing-espresso"></div>
+            </div><!-- /modal-media -->
             <div class="p-6 sm:p-8">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                     <h3 id="modal-title" class="font-display text-2xl sm:text-3xl font-bold uppercase text-racing-espresso">Titre du véhicule</h3>
